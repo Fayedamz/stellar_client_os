@@ -8,8 +8,6 @@ import {
   Heart,
   Users,
   Target,
-  Calendar,
-  Share2,
   Edit,
   ShieldCheck,
 } from "lucide-react";
@@ -18,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CampaignSponsorWall } from "@/components/modules/campaign/sponsor-wall/CampaignSponsorWall";
 import { CampaignCollaboration } from "@/components/modules/campaign/collaboration/CampaignCollaboration";
+import { CampaignImageGallery } from "@/components/campaign/CampaignImageGallery";
 
 export default function CampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -40,6 +39,20 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
     impactStatement: "Permanently offset 150 metric tons of CO2 while securing habitat for 200+ endangered species.",
     beneficiaries: "5,000 local indigenous community members",
     co2OffsetTons: "150",
+    images: [
+      {
+        src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=80",
+        alt: "Aerial view of the Amazon rainforest canopy",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
+        alt: "Dense green rainforest vegetation",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&fit=crop&w=900&q=80",
+        alt: "River winding through a tropical forest",
+      },
+    ],
   };
 
   const progressPct = Math.min(100, Math.round((parseFloat(campaign.raisedAmount) / parseFloat(campaign.goalAmount)) * 100));
@@ -112,6 +125,8 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
+      <CampaignImageGallery images={campaign.images} />
+
       {/* Main Content Tabs (Overview, Sponsor Wall #724, Co-Creators #722) */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-zinc-900 border border-zinc-800 p-1 rounded-xl">
@@ -140,7 +155,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
                   <Sparkles className="h-5 w-5 text-amber-400" /> Impact Statement & Beneficiaries
                 </h3>
                 <p className="text-sm text-amber-200/90 italic bg-amber-950/20 p-4 rounded-lg border border-amber-900/30">
-                  "{campaign.impactStatement}"
+                  &quot;{campaign.impactStatement}&quot;
                 </p>
                 <div className="grid grid-cols-2 gap-4 text-xs pt-2">
                   <div>Beneficiaries: <strong className="text-zinc-100">{campaign.beneficiaries}</strong></div>
