@@ -8,8 +8,12 @@ import {
   Heart,
   Users,
   Target,
+  Calendar,
+  Download,
+  Share2,
   Edit,
   ShieldCheck,
+  BarChart3,
   Globe,
   AlertTriangle,
 } from "lucide-react";
@@ -18,6 +22,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CampaignSponsorWall } from "@/components/modules/campaign/sponsor-wall/CampaignSponsorWall";
 import { CampaignCollaboration } from "@/components/modules/campaign/collaboration/CampaignCollaboration";
+import { CampaignSeries } from "@/components/modules/campaign/series/CampaignSeries";
+import { CampaignAnalyticsDashboard } from "@/components/modules/campaign/analytics/CampaignAnalyticsDashboard";
 import { BackerCommunity } from "@/components/modules/campaign/community/BackerCommunity";
 
 const translations = {
@@ -88,20 +94,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
     impactStatement: "Permanently offset 150 metric tons of CO2 while securing habitat for 200+ endangered species.",
     beneficiaries: "5,000 local indigenous community members",
     co2OffsetTons: "150",
-    images: [
-      {
-        src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=80",
-        alt: "Aerial view of the Amazon rainforest canopy",
-      },
-      {
-        src: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
-        alt: "Dense green rainforest vegetation",
-      },
-      {
-        src: "https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&fit=crop&w=900&q=80",
-        alt: "River winding through a tropical forest",
-      },
-    ],
+    treesPlanted: "1,500",
   };
 
   const detectedLang = detectLanguage(campaign.title + campaign.shortDescription + campaign.fullStory);
@@ -110,6 +103,43 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
   const translation = translationLang ? translations[translationLang] : null;
 
   const progressPct = Math.min(100, Math.round((parseFloat(campaign.raisedAmount) / parseFloat(campaign.goalAmount)) * 100));
+
+  const downloadCertificate = () => {
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Campaign Certificate</title>
+          <style>
+            body { font-family: Georgia, serif; background: #f8f4ea; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+            .certificate { max-width: 680px; background: #fff; border: 8px solid #b45309; padding: 48px 64px; text-align: center; }
+            .certificate h1 { color: #92400e; margin: 0 0 4px; }
+            .subtitle { text-transform: uppercase; color: #78350f; margin-bottom: 16px; font-size: 13px; }
+            .impact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+            .impact div { border: 1px solid #e7e5e4; border-radius: 8px; padding: 12px; }
+            .impact strong { display: block; font-size: 20px; color: #166534; }
+          </style>
+        </head>
+        <body>
+          <div class="certificate">
+            <div class="subtitle">Campaign Completion Certificate</div>
+            <h1>${campaign.title}</h1>
+            <p>This certifies the successful completion of the campaign and its verified impact.</p>
+            <div class="impact">
+              <div><strong>${campaign.treesPlanted}</strong>Trees Planted</div>
+              <div><strong>${campaign.co2OffsetTons} tons</strong>CO2 Offset</div>
+              <div><strong>${campaign.raisedAmount} ${campaign.token}</strong>Total Cost</div>
+            </div>
+            <p>Issued for <strong>${campaign.creator}</strong></p>
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
@@ -123,6 +153,14 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
         </Link>
 
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={downloadCertificate}
+            className="border-amber-600/40 text-amber-300 hover:bg-amber-950/40 text-xs"
+          >
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Download Certificate
+          </Button>
           <Link href="/campaigns/create">
             <Button size="sm" variant="outline" className="border-purple-600/40 text-purple-300 hover:bg-purple-950/40 text-xs">
               <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit Campaign
@@ -249,12 +287,10 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      <CampaignImageGallery images={campaign.images} />
-
-      {/* Main Content Tabs (Overview, Sponsor Wall #724, Co-Creators #722) */}
+{/* Main Content Tabs (Overview, Sponsor Wall #724, Co-Creators #722, Series, Analytics) */}
       {/* Backer community spaces (#788) render inside the overview sidebar. */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-zinc-900 border border-zinc-800 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-5 bg-zinc-900 border border-zinc-800 p-1 rounded-xl">
           <TabsTrigger value="overview" className="text-xs font-semibold data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <Target className="mr-1.5 h-4 w-4" /> Overview & Story
           </TabsTrigger>
@@ -263,6 +299,12 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           </TabsTrigger>
           <TabsTrigger value="collaboration" className="text-xs font-semibold data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <Users className="mr-1.5 h-4 w-4 text-purple-400" /> Co-Creators (#722)
+          </TabsTrigger>
+          <TabsTrigger value="series" className="text-xs font-semibold data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <Sparkles className="mr-1.5 h-4 w-4 text-amber-400" /> Series & Sequels
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs font-semibold data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <BarChart3 className="mr-1.5 h-4 w-4 text-emerald-400" /> Analytics
           </TabsTrigger>
         </TabsList>
 
@@ -325,6 +367,16 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
         {/* Tab 3: Co-Creators Collaboration (#722) */}
         <TabsContent value="collaboration">
           <CampaignCollaboration campaignId={campaign.id} campaignTitle={campaign.title} />
+        </TabsContent>
+
+        {/* Tab 4: Series & Sequels */}
+        <TabsContent value="series">
+          <CampaignSeries campaignId={campaign.id} campaignTitle={campaign.title} />
+        </TabsContent>
+
+        {/* Tab 5: Analytics for creators */}
+        <TabsContent value="analytics">
+          <CampaignAnalyticsDashboard campaignId={campaign.id} campaignTitle={campaign.title} />
         </TabsContent>
       </Tabs>
       {showInsuranceModal && (
