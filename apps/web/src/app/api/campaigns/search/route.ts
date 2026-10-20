@@ -15,5 +15,8 @@ export async function GET(request: Request) {
     limit: Number(url.searchParams.get("limit") ?? 20),
     offset: Number(url.searchParams.get("offset") ?? 0),
   });
-  return Response.json({ data: results, count: results.length });
+  const visible = url.searchParams.get("creator")
+    ? results
+    : results.filter((result) => result.campaign.status !== "DRAFT");
+  return Response.json({ data: visible, count: visible.length });
 }

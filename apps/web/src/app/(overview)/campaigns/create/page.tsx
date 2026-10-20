@@ -4,13 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CampaignWizard } from "@/components/modules/campaign/wizard/CampaignWizard";
+import { CampaignTemplateGallery } from "@/components/modules/campaign/CampaignTemplateGallery";
+import type { CampaignWizardData } from "@/components/modules/campaign/wizard/campaign-wizard-config";
 
 export default function CreateCampaignPage() {
-  const handleComplete = async (data: any) => {
+  const handleComplete = async (data: CampaignWizardData) => {
     console.log("Campaign created:", data);
   };
 
-  const handleSaveDraft = async (data: any) => {
+  const handleSaveDraft = async (data: CampaignWizardData) => {
     console.log("Campaign draft saved:", data);
   };
 
@@ -24,6 +26,8 @@ export default function CreateCampaignPage() {
           <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Back to Campaigns
         </Link>
       </div>
+
+      <CampaignTemplateGallery />
 
       <CampaignWizard onComplete={handleComplete} onSaveDraft={handleSaveDraft} />
     </div>

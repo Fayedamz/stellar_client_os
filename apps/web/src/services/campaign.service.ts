@@ -193,6 +193,19 @@ export interface CampaignRecord {
   /** Optional campaign category (e.g., Environmental & Reforestation). */
   category?: string;
   durationMs?: number;
+  /** Absolute deadline, retained for deadline extension and comparison views. */
+  deadline?: number;
+  /** Opaque token for an unauthenticated private draft preview. */
+  previewToken?: string;
+  /** Creator-configured reward tiers shown to backers. */
+  rewardTiers?: Array<{
+    id: string;
+    name: string;
+    amount: string;
+    token?: string;
+    description?: string;
+    perks?: string[];
+  }>;
   status: CampaignStatus;
   goalAmount: string;
   raisedAmount: string;
@@ -851,6 +864,7 @@ gpsLocations: input.gpsLocations,
     species: input.species,
     treeCount: input.treeCount ?? 0,
     durationMs: input.deadline !== undefined ? input.deadline - now : input.durationMs,
+    deadline: input.deadline ?? (input.durationMs !== undefined ? now + input.durationMs : undefined),
     status: "DRAFT",
     goalAmount: input.goalAmount,
     raisedAmount: input.raisedAmount ?? "0",

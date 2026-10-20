@@ -85,7 +85,7 @@ export class ElasticsearchCampaignSearchProvider implements CampaignSearchProvid
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        query: { multi_match: { query: query.query, fields: ["name^3", "description", "location^2", "speciesTags", "species", "treeSpecies", "creator"] } },
+        query: { bool: { must: [{ multi_match: { query: query.query, fields: ["name^3", "description", "location^2", "speciesTags", "species", "treeSpecies", "creator"] } }], filter: [{ term: { status: "ACTIVE" } }] } },
         size: Math.min(Math.max(query.limit ?? 20, 1), 100),
         from: Math.max(query.offset ?? 0, 0),
       }),
