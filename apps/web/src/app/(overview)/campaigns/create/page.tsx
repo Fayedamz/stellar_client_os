@@ -8,12 +8,62 @@ import { CampaignTemplateGallery } from "@/components/modules/campaign/CampaignT
 import type { CampaignWizardData } from "@/components/modules/campaign/wizard/campaign-wizard-config";
 
 export default function CreateCampaignPage() {
-  const handleComplete = async (data: CampaignWizardData) => {
-    console.log("Campaign created:", data);
+  const handleComplete = async (data: any) => {
+    // Persist the campaign, including category, tags, and milestones,
+    // through the campaign creation API.
+    const payload = {
+      ...data,
+      category: data?.category ?? null,
+      tags: Array.isArray(data?.tags) ? data.tags.slice(0, 10) : [],
+      milestones: Array.isArray(data?.milestones) ? data.milestones : [],
+    };
+
+    try {
+      const response = await fetch("/api/campaigns", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create campaign: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Campaign creation failed:", error);
+      throw error;
+    }
   };
 
-  const handleSaveDraft = async (data: CampaignWizardData) => {
-    console.log("Campaign draft saved:", data);
+  const handleSaveDraft = async (data: any) => {
+    const payload = {
+      ...data,
+      category: data?.category ?? null,
+      tags: Array.isArray(data?.tags) ? data.tags.slice(0, 10) : [],
+      milestones: Array.isArray(data?.milestones) ? data.milestones : [],
+    };
+
+    try {
+      const response = await fetch("/api/campaigns/drafts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save campaign draft: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Campaign draft save failed:", error);
+      throw error;
+    }
   };
 
   return (
@@ -27,9 +77,15 @@ export default function CreateCampaignPage() {
         </Link>
       </div>
 
-      <CampaignTemplateGallery />
-
-      <CampaignWizard onComplete={handleComplete} onSaveDraft={handleSaveDraft} />
+      <CampaignWizard
+        onComplete={handleComplete}
+        onSaveDraft={handleSaveDraft}
+        initialData={{
+          category: null,
+          tags: [],
+          milestones: [],
+        }}
+      />
     </div>
   );
 }
